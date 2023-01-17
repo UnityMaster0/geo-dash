@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 from random import randint
 
 import pygame as pg
@@ -115,7 +116,7 @@ class Block(pg.sprite.Sprite):
         self.image = pg.image.load('.//Resources/block.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
 
-        self.speed = -5
+        self.speed = -speed
 
     def scroll(self):
         self.rect.x += self.speed
@@ -134,7 +135,7 @@ class Spike(pg.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         self.image = pg.transform.scale(self.image, (64,42))
 
-        self.speed = -5
+        self.speed = -speed
 
     def scroll(self):
         self.rect.x += self.speed
@@ -156,7 +157,7 @@ class Bouncer(pg.sprite.Sprite):
             self.image = pg.image.load('.//Resources/finish.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
 
-        self.speed = -5
+        self.speed = -speed
 
     def scroll(self):
         self.rect.x += self.speed
@@ -179,14 +180,40 @@ class Logic:
         self.portals = pg.sprite.Group()
         self.finish = pg.sprite.Group()
 
+        if input('Select Level:') == 1:
+            self.level = LEVELONE
+            self.speed = SPEEDONE
+            self.size = TILEONE
+
+        if input('Select Level:') == 2:
+            self.level = LEVELTWO
+            self.speed = SPEEDTWO
+            self.size = TILETWO
+            
+        if input('Select Level:') == 3:
+            self.level = LEVELTHREE
+            self.speed = SPEEDTHREE
+            self.size = TILETHREE
+
+        if input('Select Level:') == 4:
+            self.level = LEVELFOUR
+            self.speed = SPEEDFOUR
+            self.size = TILEFOUR
+
+        if input('Select Level:') == 5:
+            self.level = LEVELFIVE
+            self.speed = SPEEDFIVE
+            self.size = TILEFIVE
+
+
         self.makeSprites()
 
     def makeSprites(self):
         self.player = Player((50, 576), self.spikes, self.blocks, self.bouncers, self.portals, self.finish, self.players) 
-        for self.row_index, row in enumerate(LEVELONE):
+        for self.row_index, row in enumerate(self.level):
             for self.col_index, col in enumerate(row):
-                x = self.col_index * TILE
-                y = self.row_index * TILE
+                x = self.col_index * self.size
+                y = self.row_index * self.size
                 if col == 'x':
                     Block((x, y), [self.blocks])
                 if col == 's':
