@@ -111,7 +111,7 @@ class Player(pg.sprite.Sprite):
 
 class Block(pg.sprite.Sprite):
 
-    def __init__(self, pos, *groups):
+    def __init__(self, pos, speed, *groups):
         super().__init__(*groups)
         self.image = pg.image.load('.//Resources/block.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
@@ -129,7 +129,7 @@ class Block(pg.sprite.Sprite):
 
 class Spike(pg.sprite.Sprite):
 
-    def __init__(self, pos, *groups):
+    def __init__(self, pos, speed, *groups):
         super().__init__(*groups)
         self.image = pg.image.load('.//Resources/spike.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
@@ -147,7 +147,7 @@ class Spike(pg.sprite.Sprite):
         
 class Bouncer(pg.sprite.Sprite):
 
-    def __init__(self, pos, type, *groups):
+    def __init__(self, pos, type, speed, *groups):
         super().__init__(*groups)
         if type == 'portal':
             self.image = pg.image.load('.//Resources/portal.png').convert_alpha()
@@ -180,27 +180,29 @@ class Logic:
         self.portals = pg.sprite.Group()
         self.finish = pg.sprite.Group()
 
-        if input('Select Level:') == 1:
+        level_select = input('Select Level: ')
+        
+        if level_select == 1:
             self.level = LEVELONE
             self.speed = SPEEDONE
             self.size = TILEONE
 
-        if input('Select Level:') == 2:
+        elif level_select == 2:
             self.level = LEVELTWO
             self.speed = SPEEDTWO
             self.size = TILETWO
             
-        if input('Select Level:') == 3:
+        elif level_select == 3:
             self.level = LEVELTHREE
             self.speed = SPEEDTHREE
             self.size = TILETHREE
 
-        if input('Select Level:') == 4:
+        elif level_select == 4:
             self.level = LEVELFOUR
             self.speed = SPEEDFOUR
             self.size = TILEFOUR
 
-        if input('Select Level:') == 5:
+        elif level_select == 5:
             self.level = LEVELFIVE
             self.speed = SPEEDFIVE
             self.size = TILEFIVE
@@ -217,13 +219,13 @@ class Logic:
                 if col == 'x':
                     Block((x, y), [self.blocks])
                 if col == 's':
-                    Spike((x, (y + 24)), [self.spikes])
+                    Spike((x, (y + 24)), self.speed, [self.spikes])
                 if col == 'b':
-                    Bouncer((x, y), 'bouncer', [self.bouncers])
+                    Bouncer((x, y), 'bouncer', self.speed, [self.bouncers])
                 if col == 'p':
-                    Bouncer((x, y), 'portal', [self.portals])
+                    Bouncer((x, y), 'portal', self.speed, [self.portals])
                 if col == 'f':
-                    Bouncer((x, y), 'finish', [self.finish])
+                    Bouncer((x, y), 'finish', self.speed, [self.finish])
 
     # Runs all game functions
     def run(self):
