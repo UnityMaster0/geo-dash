@@ -10,7 +10,7 @@ class Player(pg.sprite.Sprite):
 
     def __init__(self, pos, spikes, blocks, bouncers, portals, finish, *groups):
         super().__init__(*groups)
-        self.image = pg.image.load('.//player.png').convert_alpha()
+        self.image = pg.image.load('.//Resources/player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
 
         self.direction = pg.math.Vector2()
@@ -27,12 +27,12 @@ class Player(pg.sprite.Sprite):
     def change_mode(self):
         if pg.sprite.spritecollideany(self, self.portals) and self.mode == 'normal' and not self.mode_flag:
             self.mode = 'fly'
-            self.image = pg.image.load('.//block.png').convert_alpha()
+            self.image = pg.image.load('.//Resources/block.png').convert_alpha()
             self.mode_flag = True
 
         if pg.sprite.spritecollideany(self, self.portals) and self.mode == 'fly' and not self.mode_flag:
             self.mode = 'normal'
-            self.image = pg.image.load('.//player.png').convert_alpha()
+            self.image = pg.image.load('.//Resources/player.png').convert_alpha()
             self.mode_flag = True
 
         if not pg.sprite.spritecollideany(self, self.portals):
@@ -112,7 +112,7 @@ class Block(pg.sprite.Sprite):
 
     def __init__(self, pos, *groups):
         super().__init__(*groups)
-        self.image = pg.image.load('.//block.png').convert_alpha()
+        self.image = pg.image.load('.//Resources/block.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
 
         self.speed = -5
@@ -130,7 +130,7 @@ class Spike(pg.sprite.Sprite):
 
     def __init__(self, pos, *groups):
         super().__init__(*groups)
-        self.image = pg.image.load('.//spike.png').convert_alpha()
+        self.image = pg.image.load('.//Resources/spike.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
         self.image = pg.transform.scale(self.image, (64,42))
 
@@ -149,11 +149,11 @@ class Bouncer(pg.sprite.Sprite):
     def __init__(self, pos, type, *groups):
         super().__init__(*groups)
         if type == 'portal':
-            self.image = pg.image.load('.//portal.png').convert_alpha()
+            self.image = pg.image.load('.//Resources/portal.png').convert_alpha()
         elif type == 'bouncer':
-            self.image = pg.image.load('.//bouncer.png').convert_alpha()
+            self.image = pg.image.load('.//Resources/bouncer.png').convert_alpha()
         elif type == 'finish':
-            self.image = pg.image.load('.//finish.png').convert_alpha()
+            self.image = pg.image.load('.//Resources/finish.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
 
         self.speed = -5
