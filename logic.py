@@ -3,7 +3,7 @@ from random import randint
 
 import pygame as pg
 
-from worlddata import LEVELONE, TILE
+from worlddata import *
 
 
 class Player(pg.sprite.Sprite):
@@ -27,7 +27,7 @@ class Player(pg.sprite.Sprite):
     def change_mode(self):
         if pg.sprite.spritecollideany(self, self.portals) and self.mode == 'normal' and not self.mode_flag:
             self.mode = 'fly'
-            self.image = pg.image.load('.//Resources/block.png').convert_alpha()
+            self.image = pg.image.load('.//Resources/fly.png').convert_alpha()
             self.mode_flag = True
 
         if pg.sprite.spritecollideany(self, self.portals) and self.mode == 'fly' and not self.mode_flag:
