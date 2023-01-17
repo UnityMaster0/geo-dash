@@ -3,7 +3,7 @@ import time
 
 import pygame as pg
 
-from level1 import Logic
+from logic import Logic
 
 class gameContoller:
 
