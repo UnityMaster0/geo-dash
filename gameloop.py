@@ -4,8 +4,6 @@ import time
 import pygame as pg
 
 from logic import Logic
-from worlddata import *
-
 
 class gameContoller:
 
