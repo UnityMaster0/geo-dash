@@ -8,7 +8,7 @@ from worlddata import *
 
 class Player(pg.sprite.Sprite):
 
-    def __init__(self, pos, spikes, blocks, bouncers, portals, finish, *groups):
+    def __init__(self, pos, spikes, blocks, bouncers, fly_portals, finish, invert_portals, *groups):
         super().__init__(*groups)
         self.image = pg.image.load('.//Resources/player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
@@ -21,8 +21,9 @@ class Player(pg.sprite.Sprite):
         self.blocks = blocks
         self.spikes = spikes
         self.bouncers = bouncers
-        self.portals = portals
+        self.fly_portals = fly_portals
         self.finish = finish
+        self.invert_portals = invert_portals
 
     def change_mode(self):
         if pg.sprite.spritecollideany(self, self.portals) and self.mode == 'normal' and not self.mode_flag:
@@ -30,20 +31,20 @@ class Player(pg.sprite.Sprite):
             self.image = pg.image.load('.//Resources/fly.png').convert_alpha()
             self.mode_flag = True
 
-        if pg.sprite.spritecollideany(self, self.portals) and self.mode == 'fly' and not self.mode_flag:
+        if pg.sprite.spritecollideany(self, self.fly_portals) and self.mode == 'fly' and not self.mode_flag:
             self.mode = 'normal'
             self.image = pg.image.load('.//Resources/player.png').convert_alpha()
             self.mode_flag = True
 
+        if pg.sprite.spritecollideany(self, self.invert_portals) and self.mode == 'normal' and not self.mode_flag:
+            self.mode = 'invert'
+            self.mode_flag = True
+            
         if pg.sprite.spritecollideany(self, self.invert_portals) and self.mode == 'invert' and not self.mode_flag:
             self.mode = 'normal'
-            self.image = pg.image.load('.//Resources/player.png').convert_alpha()
             self.mode_flag = True
 
-        if not pg.sprite.spritecollideany(self, self.portals):
-            self.mode_flag = False
-
-        if not pg.sprite.spritecollideany(self, self.invert_portals):
+        if not pg.sprite.spritecollideany(self, self.portals) and not pg.sprite.spritecollideany(self, self.invert_portals):
             self.mode_flag = False
     
     def floor_set(self):
@@ -55,10 +56,24 @@ class Player(pg.sprite.Sprite):
                 else:
                     self.floor = block.rect.y - 78
                     self.pass_check = block.rect.y
+                    
+    def floor_set_invert(self):
+        self.pass_check = -1000
+        for block in self.blocks:
+            if block.rect.x >= 0 and block.rect.x <= 114:
+                if block.rect.y <= self.pass_check:
+                    pass
+                else:
+                    self.floor = block.rect.y + 78
+                    self.pass_check = block.rect.y
 
     def bounce(self):
         if pg.sprite.spritecollideany(self, self.bouncers) and pg.key.get_pressed()[pg.K_SPACE]:
             self.jump_force = -30
+            
+    def bounce_invert(self):
+        if pg.sprite.spritecollideany(self, self.bouncers) and pg.key.get_pressed()[pg.K_SPACE]:
+            self.jump_force = 30
 
     def gravity(self):
 
@@ -128,6 +143,8 @@ class Player(pg.sprite.Sprite):
         if self.mode == 'fly':
             self.flying()
         if self.mode == 'invert':
+            self.floor_set_invert()
+            self.bounce_invert()
             self.gravity_invert()
             self.jump_invert()
         self.move()
@@ -204,14 +221,14 @@ class Logic:
         self.blocks = pg.sprite.Group()
         self.spikes = pg.sprite.Group()
         self.bouncers = pg.sprite.Group()
-        self.portals = pg.sprite.Group()
+        self.fly_portals = pg.sprite.Group()
         self.finish = pg.sprite.Group()
         self.invert_portals = pg.sprite.Group()
 
         self.makeSprites()
 
     def makeSprites(self):
-        self.player = Player((50, 576), self.spikes, self.blocks, self.bouncers, self.portals, self.finish, self.players) 
+        self.player = Player((50, 576), self.spikes, self.blocks, self.bouncers, self.fly_portals, self.finish, self.invert_portals, self.players) 
         for self.row_index, row in enumerate(LEVELONE):
             for self.col_index, col in enumerate(row):
                 x = self.col_index * TILEONE
@@ -223,7 +240,7 @@ class Logic:
                 if col == 'b':
                     Bouncer((x, y), 'bouncer', [self.bouncers])
                 if col == 'p':
-                    Bouncer((x, y), 'portal', [self.portals])
+                    Bouncer((x, y), 'portal', [self.fly_portals])
                 if col == 'f':
                     Bouncer((x, y), 'finish', [self.finish])
                 if col == 'i':
