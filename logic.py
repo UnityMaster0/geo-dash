@@ -5,6 +5,16 @@ import pygame as pg
 
 from worlddata import *
 
+mixer.init()
+
+#Load audio file
+mixer.music.load('tension-112135.mp3')
+
+#Set preferred volume
+mixer.music.set_volume(0.5)
+
+#Play the music
+mixer.music.play()
 
 class Player(pg.sprite.Sprite):
 
