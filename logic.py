@@ -183,7 +183,7 @@ class Logic:
 
     def makeSprites(self):
         self.player = Player((50, 576), self.spikes, self.blocks, self.bouncers, self.portals, self.finish, self.players) 
-        for self.row_index, row in enumerate(LEVELONE):
+        for self.row_index, row in enumerate(LEVELTWO):
             for self.col_index, col in enumerate(row):
                 x = self.col_index * TILE
                 y = self.row_index * TILE
