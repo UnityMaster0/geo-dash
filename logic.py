@@ -197,7 +197,7 @@ class Spike(pg.sprite.Sprite):
     def update(self):
         self.scroll()
         
-class Bouncer(pg.sprite.Sprite):
+class Orb(pg.sprite.Sprite):
 
     def __init__(self, pos, type, *groups):
         super().__init__(*groups)
@@ -208,7 +208,7 @@ class Bouncer(pg.sprite.Sprite):
         elif type == 'finish':
             self.image = pg.image.load('.//Resources/finish.png').convert_alpha()
         elif type == 'invert':
-            self.image = pg.image.load('.//Resources/finish.png').convert_alpha()
+            self.image = pg.image.load('.//Resources/invert.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
 
         self.speed = -5
@@ -248,13 +248,13 @@ class Logic:
                 if col == 's':
                     Spike((x, (y + 24)), [self.spikes])
                 if col == 'b':
-                    Bouncer((x, y), 'bouncer', [self.bouncers])
+                    Orb((x, y), 'bouncer', [self.bouncers])
                 if col == 'p':
-                    Bouncer((x, y), 'portal', [self.fly_portals])
+                    Orb((x, y), 'portal', [self.fly_portals])
                 if col == 'f':
-                    Bouncer((x, y), 'finish', [self.finish])
+                    Orb((x, y), 'finish', [self.finish])
                 if col == 'i':
-                    Bouncer((x, y), 'invert', [self.invert_portals])
+                    Orb((x, y), 'invert', [self.invert_portals])
 
     # Runs all game functions
     def run(self):
