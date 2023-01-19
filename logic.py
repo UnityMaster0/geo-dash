@@ -5,16 +5,16 @@ import pygame as pg
 
 from worlddata import *
 
-mixer.init()
+pg.mixer.init()
 
 #Load audio file
-mixer.music.load('tension-112135.mp3')
+pg.mixer.music.load('Music/tension-112135.mp3')
 
 #Set preferred volume
-mixer.music.set_volume(0.5)
+pg.mixer.music.set_volume(0.5)
 
 #Play the music
-mixer.music.play()
+pg.mixer.music.play()
 
 class Player(pg.sprite.Sprite):
 
@@ -36,7 +36,7 @@ class Player(pg.sprite.Sprite):
         self.invert_portals = invert_portals
 
     def change_mode(self):
-        if pg.sprite.spritecollideany(self, self.portals) and self.mode == 'normal' and not self.mode_flag:
+        if pg.sprite.spritecollideany(self, self.fly_portals) and self.mode == 'normal' and not self.mode_flag:
             self.mode = 'fly'
             self.image = pg.image.load('.//Resources/fly.png').convert_alpha()
             self.mode_flag = True
@@ -54,7 +54,7 @@ class Player(pg.sprite.Sprite):
             self.mode = 'normal'
             self.mode_flag = True
 
-        if not pg.sprite.spritecollideany(self, self.portals) and not pg.sprite.spritecollideany(self, self.invert_portals):
+        if not pg.sprite.spritecollideany(self, self.fly_portals) and not pg.sprite.spritecollideany(self, self.invert_portals):
             self.mode_flag = False
     
     def floor_set(self):
@@ -262,11 +262,13 @@ class Logic:
         self.blocks.update()
         self.spikes.update()
         self.bouncers.update()
-        self.portals.update()
+        self.fly_portals.update()
+        self.invert_portals.update()
         self.finish.update()
         self.players.draw(self.display_surface)
         self.blocks.draw(self.display_surface)
         self.spikes.draw(self.display_surface)
         self.bouncers.draw(self.display_surface)
-        self.portals.draw(self.display_surface)
+        self.fly_portals.draw(self.display_surface)
         self.finish.draw(self.display_surface)
+        self.invert_portals.draw(self.display_surface)
