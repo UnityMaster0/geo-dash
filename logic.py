@@ -3,19 +3,6 @@ from random import randint
 
 import pygame as pg
 
-from worlddata import *
-
-pg.mixer.init()
-
-#Load audio file
-pg.mixer.music.load('Music/tension-112135.mp3')
-
-#Set preferred volume
-pg.mixer.music.set_volume(0.5)
-
-#Play the music
-pg.mixer.music.play()
-
 class Player(pg.sprite.Sprite):
 
     def __init__(self, pos, spikes, blocks, bouncers, fly_portals, finish, invert_portals, *groups):
@@ -27,6 +14,7 @@ class Player(pg.sprite.Sprite):
         self.gravity_force = 15
         self.jump_force = 0
         self.mode = 'normal'
+        self.mode_pause = False
 
         self.blocks = blocks
         self.spikes = spikes
@@ -36,8 +24,35 @@ class Player(pg.sprite.Sprite):
         self.invert_portals = invert_portals
 
     def change_mode(self):
+        
+        if pg.sprite.spritecollideany(self, self.invert_portals) and self.mode == 'normal' and not self.mode_flag:
+            
+            self.mode = 'normal-invert'
+            self.mode_flag = True
+            self.mode_pause = True
+
+        if pg.sprite.spritecollideany(self, self.invert_portals) and self.mode == 'normal-invert' and not self.mode_flag:
+            
+            self.mode = 'normal'
+            self.mode_flag = True
+            self.mode_pause = True
+
+        if pg.sprite.spritecollideany(self, self.invert_portals) and self.mode == 'fly' and not self.mode_flag:
+            self.mode = 'fly-invert'
+            self.mode_flag = True
+
+        if pg.sprite.spritecollideany(self, self.invert_portals) and self.mode == 'fly-invert' and not self.mode_flag:
+            self.mode = 'fly'
+            self.mode_flag = True
+
+
         if pg.sprite.spritecollideany(self, self.fly_portals) and self.mode == 'normal' and not self.mode_flag:
             self.mode = 'fly'
+            self.image = pg.image.load('.//Resources/fly.png').convert_alpha()
+            self.mode_flag = True
+
+        if pg.sprite.spritecollideany(self, self.fly_portals) and self.mode == 'normal-invert' and not self.mode_flag:
+            self.mode = 'fly-invert'
             self.image = pg.image.load('.//Resources/fly.png').convert_alpha()
             self.mode_flag = True
 
@@ -46,12 +61,9 @@ class Player(pg.sprite.Sprite):
             self.image = pg.image.load('.//Resources/player.png').convert_alpha()
             self.mode_flag = True
 
-        if pg.sprite.spritecollideany(self, self.invert_portals) and self.mode == 'normal' and not self.mode_flag:
-            self.mode = 'invert'
-            self.mode_flag = True
-            
-        if pg.sprite.spritecollideany(self, self.invert_portals) and self.mode == 'invert' and not self.mode_flag:
-            self.mode = 'normal'
+        if pg.sprite.spritecollideany(self, self.fly_portals) and self.mode == 'fly-invert' and not self.mode_flag:
+            self.mode = 'normal-invert'
+            self.image = pg.image.load('.//Resources/player.png').convert_alpha()
             self.mode_flag = True
 
         if not pg.sprite.spritecollideany(self, self.fly_portals) and not pg.sprite.spritecollideany(self, self.invert_portals):
@@ -90,16 +102,28 @@ class Player(pg.sprite.Sprite):
         if self.rect.y <= self.floor:
             self.direction.y = self.gravity_force
 
+        if self.rect.y > self.floor + 30 and self.mode_pause == False:
+            self.kill()
+            return True
+
         if self.rect.y > self.floor:
-            self.rect.y = self.floor
+            self.rect.y = self.floor 
+
+        self.mode_pause = False  
 
     def gravity_invert(self):
 
         if self.rect.y >= self.floor:
             self.direction.y = -self.gravity_force
 
+        if self.rect.y < self.floor - 30 and self.mode_pause == False:
+            self.kill()
+            return True
+
         if self.rect.y < self.floor:
             self.rect.y = self.floor
+
+        self.mode_pause = False
 
     def jump(self):
 
@@ -128,14 +152,27 @@ class Player(pg.sprite.Sprite):
             pg.quit()
             sys.exit()
 
+    def flying_invert(self):
+
+        self.direction.y = -self.gravity_force
+
+        if pg.key.get_pressed()[pg.K_SPACE]:
+            self.jump_force = 20
+        elif self.rect.y < self.floor:
+            self.jump_force -= 0.3
+        
+        if pg.sprite.spritecollideany(self, self.blocks):
+            pg.quit()
+            sys.exit()
+
     def move(self):
         self.rect.y += self.direction.y + self.jump_force
 
-    def death(self):
+    def death(self):      
         if pg.sprite.spritecollideany(self, self.spikes):
-            pg.quit()
-            sys.exit()
-    
+            self.kill()
+            return True
+            
     def end(self):
         if pg.sprite.spritecollideany(self, self.finish):
             print('Level Completed!')
@@ -152,23 +189,25 @@ class Player(pg.sprite.Sprite):
             self.jump()
         if self.mode == 'fly':
             self.flying()
-        if self.mode == 'invert':
+        if self.mode == 'normal-invert':
             self.floor_set_invert()
             self.bounce_invert()
             self.gravity_invert()
             self.jump_invert()
+        if self.mode == 'fly-invert':
+            self.flying_invert()
         self.move()
         self.death()
         self.end()
 
 class Block(pg.sprite.Sprite):
 
-    def __init__(self, pos, *groups):
+    def __init__(self, pos, speed, *groups):
         super().__init__(*groups)
         self.image = pg.image.load('.//Resources/block.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
 
-        self.speed = -5
+        self.speed = -speed
 
     def scroll(self):
         self.rect.x += self.speed
@@ -181,13 +220,13 @@ class Block(pg.sprite.Sprite):
 
 class Spike(pg.sprite.Sprite):
 
-    def __init__(self, pos, *groups):
+    def __init__(self, pos, speed, *groups):
         super().__init__(*groups)
         self.image = pg.image.load('.//Resources/spike.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
         self.image = pg.transform.scale(self.image, (64,42))
 
-        self.speed = -5
+        self.speed = -speed
 
     def scroll(self):
         self.rect.x += self.speed
@@ -199,7 +238,7 @@ class Spike(pg.sprite.Sprite):
         
 class Orb(pg.sprite.Sprite):
 
-    def __init__(self, pos, type, *groups):
+    def __init__(self, pos, type, speed, *groups):
         super().__init__(*groups)
         if type == 'portal':
             self.image = pg.image.load('.//Resources/portal.png').convert_alpha()
@@ -211,7 +250,7 @@ class Orb(pg.sprite.Sprite):
             self.image = pg.image.load('.//Resources/invert.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
 
-        self.speed = -5
+        self.speed = -speed
 
     def scroll(self):
         self.rect.x += self.speed
@@ -223,38 +262,64 @@ class Orb(pg.sprite.Sprite):
 
 class Logic:
 
-    def __init__(self):
+    def __init__(self, world, speed, size, music):
 
         self.display_surface = pg.display.get_surface()
-        # Creates sprite groups
+        
         self.players = pg.sprite.Group()
         self.blocks = pg.sprite.Group()
         self.spikes = pg.sprite.Group()
         self.bouncers = pg.sprite.Group()
         self.fly_portals = pg.sprite.Group()
-        self.finish = pg.sprite.Group()
+        self.finish_portals = pg.sprite.Group()
         self.invert_portals = pg.sprite.Group()
 
-        self.makeSprites()
+        self.world = world
+        self.speed = speed
+        self.size = size
+        self.music = music
 
-    def makeSprites(self):
-        self.player = Player((50, 576), self.spikes, self.blocks, self.bouncers, self.fly_portals, self.finish, self.invert_portals, self.players) 
-        for self.row_index, row in enumerate(LEVELONE):
+        self.setup_world()
+
+    def setup_world(self):
+        self.player = Player((50, 576), self.spikes, self.blocks, self.bouncers, self.fly_portals, self.finish_portals, self.invert_portals, self.players) 
+        for self.row_index, row in enumerate(self.world):
             for self.col_index, col in enumerate(row):
-                x = self.col_index * TILEONE
-                y = self.row_index * TILEONE
+                x = self.col_index * self.size
+                y = self.row_index * self.size
                 if col == 'x':
-                    Block((x, y), [self.blocks])
+                    Block((x, y), self.speed, [self.blocks])
                 if col == 's':
-                    Spike((x, (y + 24)), [self.spikes])
+                    Spike((x, (y + 24)), self.speed, [self.spikes])
                 if col == 'b':
-                    Orb((x, y), 'bouncer', [self.bouncers])
+                    Orb((x, y), 'bouncer', self.speed, [self.bouncers])
                 if col == 'p':
-                    Orb((x, y), 'portal', [self.fly_portals])
+                    Orb((x, y), 'portal', self.speed, [self.fly_portals])
                 if col == 'f':
-                    Orb((x, y), 'finish', [self.finish])
+                    Orb((x, y), 'finish', self.speed, [self.finish_portals])
                 if col == 'i':
-                    Orb((x, y), 'invert', [self.invert_portals])
+                    Orb((x, y), 'invert', self.speed, [self.invert_portals])
+        pg.mixer.init()
+        pg.mixer.music.load(self.music)
+        pg.mixer.music.set_volume(0.5)
+        pg.mixer.music.play()
+
+    def restart(self):
+        if self.player.gravity == True or self.player.gravity_invert == True or self.player.death == True or pg.key.get_pressed()[pg.K_r]:
+            
+            self.players.empty()
+            self.blocks.empty()
+            self.spikes.empty()
+            self.bouncers.empty()
+            self.fly_portals.empty()
+            self.finish_portals.empty()
+            self.invert_portals.empty()
+            self.finish_portals.empty()
+            self.invert_portals.empty()
+
+            self.setup_world()
+
+            dead = False
 
     # Runs all game functions
     def run(self):
@@ -264,11 +329,12 @@ class Logic:
         self.bouncers.update()
         self.fly_portals.update()
         self.invert_portals.update()
-        self.finish.update()
+        self.finish_portals.update()
+        self.restart()
         self.players.draw(self.display_surface)
         self.blocks.draw(self.display_surface)
         self.spikes.draw(self.display_surface)
         self.bouncers.draw(self.display_surface)
         self.fly_portals.draw(self.display_surface)
-        self.finish.draw(self.display_surface)
+        self.finish_portals.draw(self.display_surface)
         self.invert_portals.draw(self.display_surface)
