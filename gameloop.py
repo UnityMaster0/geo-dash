@@ -14,32 +14,11 @@ class gameContoller:
 
         pg.init()
         self.screen = pg.display.set_mode((1680, 1080))
-        
-        level_select = input('What level do you want? (Answer 1-5): ')
         pg.display.set_caption('Geo-Dash')
         self.clock = pg.time.Clock()
         pg.mouse.set_cursor(*pg.cursors.diamond)
+        self.logic = Logic()
 
-        if level_select == '1':
-            self.logic = Logic(LEVELONE, SPEEDONE, SIZEONE, MUSICONE)
-            pg.display.set_caption('Geo-Dash - Level 1')
-            
-        if level_select == '2':
-            self.logic = Logic(LEVELTWO, SPEEDTWO, SIZETWO, MUSICTWO)
-            pg.display.set_caption('Geo-Dash - Level 2')
-
-        if level_select == '3':
-            self.logic = Logic(LEVELTHREE, SPEEDTHREE, SIZETHREE, MUSICTHREE)
-            pg.display.set_caption('Geo-Dash - Level 3')
-
-        if level_select == '4':
-            self.logic = Logic(LEVELFOUR, SPEEDFOUR, SIZEFOUR, MUSICFOUR)
-            pg.display.set_caption('Geo-Dash - Level 4')
-
-        if level_select == '5':
-            self.logic = Logic(LEVELFIVE, SPEEDFIVE, SIZEFIVE, MUSICFIVE)
-            pg.display.set_caption('Geo-Dash - Level 5')
-    
     # Runs the game
     def run(self):
         while True:

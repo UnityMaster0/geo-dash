@@ -2,6 +2,7 @@ import os, sys
 from random import randint
 
 import pygame as pg
+from worlddata import *
 
 class Player(pg.sprite.Sprite):
 
@@ -260,12 +261,55 @@ class Orb(pg.sprite.Sprite):
     def update(self):
         self.scroll()
 
+class Button(pg.sprite.Sprite):
+
+    def __init__(self, pos, type, *groups):
+        super().__init__(*groups)
+        if type == 'portal':
+            self.image = pg.image.load('.//Resources/portal.png').convert_alpha()
+        elif type == 'bouncer':
+            self.image = pg.image.load('.//Resources/bouncer.png').convert_alpha()
+        elif type == 'finish':
+            self.image = pg.image.load('.//Resources/finish.png').convert_alpha()
+        self.rect = self.image.get_rect(topleft=pos)
+
+class Start:
+
+    def __init__(self):
+
+        self.buttons = pg.sprite.Group()
+
+        self.choice_made = False
+
+        Button((50,50), 'portal', self.buttons)
+
+        Button((200,50), 'bouncer', self.buttons)
+
+    def select(self):
+
+        pos = pg.mouse.get_pos()
+        pressed = pg.mouse.get_pressed()
+
+        if pos >= (50, 114) and pos <= (114, 50) and pressed == (True, False, False):
+            self.level = LEVELONE
+            self.size = SIZEONE
+            self.speed = SPEEDONE
+            self.music = MUSICONE
+            self.choice_made = True
+
+        if pos >= (200, 114) and pos <= (264, 50) and pressed == (True, False, False):
+            self.level = LEVELTWO
+            self.size = SIZETWO
+            self.speed = SPEEDTWO
+            self.music = MUSICTWO
+            self.choice_made = True
+
 class Logic:
 
-    def __init__(self, world, speed, size, music):
+    def __init__(self):
 
         self.display_surface = pg.display.get_surface()
-        
+        # Creates sprite groups
         self.players = pg.sprite.Group()
         self.blocks = pg.sprite.Group()
         self.spikes = pg.sprite.Group()
@@ -274,35 +318,27 @@ class Logic:
         self.finish_portals = pg.sprite.Group()
         self.invert_portals = pg.sprite.Group()
 
-        self.world = world
-        self.speed = speed
-        self.size = size
-        self.music = music
+        self.started = False
+        self.start = Start()
 
-        self.setup_world()
-
-    def setup_world(self):
+    def makeSprites(self):
         self.player = Player((50, 576), self.spikes, self.blocks, self.bouncers, self.fly_portals, self.finish_portals, self.invert_portals, self.players) 
-        for self.row_index, row in enumerate(self.world):
+        for self.row_index, row in enumerate(self.start.level):
             for self.col_index, col in enumerate(row):
-                x = self.col_index * self.size
-                y = self.row_index * self.size
+                x = self.col_index * self.start.size
+                y = self.row_index * self.start.size
                 if col == 'x':
-                    Block((x, y), self.speed, [self.blocks])
+                    Block((x, y), self.start.speed, [self.blocks])
                 if col == 's':
-                    Spike((x, (y + 24)), self.speed, [self.spikes])
+                    Spike((x, (y + 24)), self.start.speed, [self.spikes])
                 if col == 'b':
-                    Orb((x, y), 'bouncer', self.speed, [self.bouncers])
+                    Orb((x, y), 'bouncer', self.start.speed, [self.bouncers])
                 if col == 'p':
-                    Orb((x, y), 'portal', self.speed, [self.fly_portals])
+                    Orb((x, y), 'portal', self.start.speed, [self.fly_portals])
                 if col == 'f':
-                    Orb((x, y), 'finish', self.speed, [self.finish_portals])
+                    Orb((x, y), 'finish', self.start.speed, [self.finish_portals])
                 if col == 'i':
-                    Orb((x, y), 'invert', self.speed, [self.invert_portals])
-        pg.mixer.init()
-        pg.mixer.music.load(self.music)
-        pg.mixer.music.set_volume(0.5)
-        pg.mixer.music.play()
+                    Orb((x, y), 'invert', self.start.speed, [self.invert_portals])
 
     def restart(self):
         if self.player.gravity == True or self.player.gravity_invert == True or self.player.death == True or pg.key.get_pressed()[pg.K_r]:
@@ -317,24 +353,38 @@ class Logic:
             self.finish_portals.empty()
             self.invert_portals.empty()
 
-            self.setup_world()
+            self.makeSprites()
 
             dead = False
 
     # Runs all game functions
     def run(self):
-        self.players.update()
-        self.blocks.update()
-        self.spikes.update()
-        self.bouncers.update()
-        self.fly_portals.update()
-        self.invert_portals.update()
-        self.finish_portals.update()
-        self.restart()
-        self.players.draw(self.display_surface)
-        self.blocks.draw(self.display_surface)
-        self.spikes.draw(self.display_surface)
-        self.bouncers.draw(self.display_surface)
-        self.fly_portals.draw(self.display_surface)
-        self.finish_portals.draw(self.display_surface)
-        self.invert_portals.draw(self.display_surface)
+        if self.start.choice_made == False:
+            self.start.select()
+            self.start.buttons.draw(self.display_surface)
+
+        if self.start.choice_made == True:
+            
+            if self.started == False:
+                self.makeSprites()
+                pg.mixer.init()
+                pg.mixer.music.load(self.start.music)
+                pg.mixer.music.set_volume(0.5)
+                pg.mixer.music.play()
+                self.started = True
+
+            self.players.update()
+            self.blocks.update()
+            self.spikes.update()
+            self.bouncers.update()
+            self.fly_portals.update()
+            self.finish_portals.update()
+            self.invert_portals.update()
+            self.restart()
+            self.players.draw(self.display_surface)
+            self.blocks.draw(self.display_surface)
+            self.spikes.draw(self.display_surface)
+            self.bouncers.draw(self.display_surface)
+            self.fly_portals.draw(self.display_surface)
+            self.finish_portals.draw(self.display_surface)
+            self.invert_portals.draw(self.display_surface)
