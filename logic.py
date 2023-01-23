@@ -16,6 +16,7 @@ class Player(pg.sprite.Sprite):
         self.jump_force = 0
         self.mode = 'normal'
         self.mode_pause = False
+        self.dead = False
 
         self.blocks = blocks
         self.spikes = spikes
@@ -105,7 +106,7 @@ class Player(pg.sprite.Sprite):
 
         if self.rect.y > self.floor + 30 and self.mode_pause == False:
             self.kill()
-            return True
+            self.dead = True
 
         if self.rect.y > self.floor:
             self.rect.y = self.floor 
@@ -119,7 +120,7 @@ class Player(pg.sprite.Sprite):
 
         if self.rect.y < self.floor - 30 and self.mode_pause == False:
             self.kill()
-            return True
+            self.dead = True
 
         if self.rect.y < self.floor:
             self.rect.y = self.floor
@@ -172,7 +173,7 @@ class Player(pg.sprite.Sprite):
     def death(self):      
         if pg.sprite.spritecollideany(self, self.spikes):
             self.kill()
-            return True
+            self.dead = True
             
     def end(self):
         if pg.sprite.spritecollideany(self, self.finish):
@@ -341,7 +342,7 @@ class Logic:
                     Orb((x, y), 'invert', self.start.speed, [self.invert_portals])
 
     def restart(self):
-        if self.player.gravity == True or self.player.gravity_invert == True or self.player.death == True or pg.key.get_pressed()[pg.K_r]:
+        if self.player.dead == True:
             
             self.players.empty()
             self.blocks.empty()
@@ -355,7 +356,12 @@ class Logic:
 
             self.makeSprites()
 
-            dead = False
+            pg.mixer.init()
+            pg.mixer.music.load(self.start.music)
+            pg.mixer.music.set_volume(0.5)
+            pg.mixer.music.play()
+
+            self.player.dead = False
 
     # Runs all game functions
     def run(self):
