@@ -283,8 +283,8 @@ class Start:
         self.choice_made = False
 
         Button((50,50), 'portal', self.buttons)
-
         Button((200,50), 'bouncer', self.buttons)
+        Button((350,50), 'finish', self.buttons)
 
     def select(self):
 
@@ -303,6 +303,13 @@ class Start:
             self.size = SIZETWO
             self.speed = SPEEDTWO
             self.music = MUSICTWO
+            self.choice_made = True
+
+        if pos >= (350, 114) and pos <= (414, 50) and pressed == (True, False, False):
+            self.level = LEVELTHREE
+            self.size = SIZETHREE
+            self.speed = SPEEDTHREE
+            self.music = MUSICTHREE
             self.choice_made = True
 
 class Logic:
