@@ -370,6 +370,24 @@ class Logic:
 
             self.player.dead = False
 
+    def change_level(self):
+
+        if pg.key.get_pressed()[pg.K_r]:
+            self.start.choice_made = False
+            self.started = False
+
+            self.players.empty()
+            self.blocks.empty()
+            self.spikes.empty()
+            self.bouncers.empty()
+            self.fly_portals.empty()
+            self.finish_portals.empty()
+            self.invert_portals.empty()
+            self.finish_portals.empty()
+            self.invert_portals.empty()
+
+            pg.mixer.music.stop()
+
     # Runs all game functions
     def run(self):
         if self.start.choice_made == False:
@@ -394,6 +412,7 @@ class Logic:
             self.finish_portals.update()
             self.invert_portals.update()
             self.restart()
+            self.change_level()
             self.players.draw(self.display_surface)
             self.blocks.draw(self.display_surface)
             self.spikes.draw(self.display_surface)
