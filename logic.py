@@ -151,8 +151,8 @@ class Player(pg.sprite.Sprite):
             self.jump_force += 0.3
         
         if pg.sprite.spritecollideany(self, self.blocks):
-            pg.quit()
-            sys.exit()
+            self.kill()
+            self.dead = True
 
     def flying_invert(self):
 
@@ -164,8 +164,8 @@ class Player(pg.sprite.Sprite):
             self.jump_force -= 0.3
         
         if pg.sprite.spritecollideany(self, self.blocks):
-            pg.quit()
-            sys.exit()
+            self.kill()
+            self.dead = True
 
     def move(self):
         self.rect.y += self.direction.y + self.jump_force
