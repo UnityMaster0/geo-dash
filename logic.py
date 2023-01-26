@@ -8,7 +8,8 @@ class Player(pg.sprite.Sprite):
 
     def __init__(self, pos, spikes, blocks, bouncers, fly_portals, finish, invert_portals, *groups):
         super().__init__(*groups)
-        self.image = pg.image.load('.//Resources/happy.jpg').convert_alpha()
+        self.image = pg.image.load('.//Resources/happy.jpg')
+        self.image = pg.transform.scale(self.image, (64, 64))
         self.rect = self.image.get_rect(topleft=pos)
 
         self.direction = pg.math.Vector2()
@@ -114,6 +115,8 @@ class Player(pg.sprite.Sprite):
         self.mode_pause = False  
 
     def gravity_invert(self):
+
+        self.image = pg.transform.rotate(self.image, 180)
 
         if self.rect.y >= self.floor:
             self.direction.y = -self.gravity_force
