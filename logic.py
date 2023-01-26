@@ -222,11 +222,16 @@ class Block(pg.sprite.Sprite):
 
 class Spike(pg.sprite.Sprite):
 
-    def __init__(self, pos, speed, *groups):
+    def __init__(self, pos, type, speed, *groups):
         super().__init__(*groups)
         self.image = pg.image.load('.//Resources/spike.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
         self.image = pg.transform.scale(self.image, (64,42))
+        
+        if type == 'normal':
+            pass
+        if type == 'invert':
+            self.image = pg.transform.rotate(self.image, 180)
 
         self.speed = -speed
 
@@ -338,7 +343,9 @@ class Logic:
                 if col == 'x':
                     Block((x, y), self.start.speed, [self.blocks])
                 if col == 's':
-                    Spike((x, (y + 24)), self.start.speed, [self.spikes])
+                    Spike((x, (y + 24)), 'normal', self.start.speed, [self.spikes])
+                if col == 'z':
+                    Spike((x, y), 'invert', self.start.speed, [self.spikes])
                 if col == 'b':
                     Orb((x, y), 'bouncer', self.start.speed, [self.bouncers])
                 if col == 'p':
