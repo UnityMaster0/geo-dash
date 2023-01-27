@@ -390,8 +390,6 @@ class Logic:
             self.fly_portals.empty()
             self.finish_portals.empty()
             self.invert_portals.empty()
-            self.finish_portals.empty()
-            self.invert_portals.empty()
 
             pg.mixer.music.stop()
 
