@@ -66,11 +66,17 @@ class Player(pg.sprite.Sprite):
 
         if pg.sprite.spritecollideany(self, self.fly_portals) and self.mode == 'fly-invert' and not self.mode_flag:
             self.mode = 'normal-invert'
-            self.image = pg.image.load('.//Resources/player.png').convert_alpha()
+            self.image = pg.transform.flip(pg.image.load('.//Resources/player.png'), True, False)
             self.mode_flag = True
 
         if not pg.sprite.spritecollideany(self, self.fly_portals) and not pg.sprite.spritecollideany(self, self.invert_portals):
             self.mode_flag = False
+
+    def blitme(self):
+        if self.orientation == "Right":
+            self.screen.blit(self.image, self.rect)
+        elif self.orientation == "Left":
+            self.screen.blit(pg.transform.flip(self.image, False, True), self.rect)
     
     def floor_set(self):
         self.pass_check = 1000
@@ -115,8 +121,6 @@ class Player(pg.sprite.Sprite):
         self.mode_pause = False  
 
     def gravity_invert(self):
-
-        self.image = pg.transform.rotate(self.image, 180)
 
         if self.rect.y >= self.floor:
             self.direction.y = -self.gravity_force
