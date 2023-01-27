@@ -154,8 +154,8 @@ class Player(pg.sprite.Sprite):
             self.jump_force += 0.3
         
         if pg.sprite.spritecollideany(self, self.blocks):
-            pg.quit()
-            sys.exit()
+            self.kill()
+            self.dead = True
 
     def flying_invert(self):
 
@@ -167,8 +167,8 @@ class Player(pg.sprite.Sprite):
             self.jump_force -= 0.3
         
         if pg.sprite.spritecollideany(self, self.blocks):
-            pg.quit()
-            sys.exit()
+            self.kill()
+            self.dead = True
 
     def move(self):
         self.rect.y += self.direction.y + self.jump_force
@@ -209,7 +209,7 @@ class Block(pg.sprite.Sprite):
 
     def __init__(self, pos, speed, *groups):
         super().__init__(*groups)
-        self.image = pg.image.load('.//Resources/block.png').convert_alpha()
+        self.image = pg.image.load('.//Resources/block.svg').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
 
         self.speed = -speed
@@ -225,11 +225,16 @@ class Block(pg.sprite.Sprite):
 
 class Spike(pg.sprite.Sprite):
 
-    def __init__(self, pos, speed, *groups):
+    def __init__(self, pos, type, speed, *groups):
         super().__init__(*groups)
         self.image = pg.image.load('.//Resources/spike.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
         self.image = pg.transform.scale(self.image, (64,42))
+        
+        if type == 'normal':
+            pass
+        if type == 'invert':
+            self.image = pg.transform.rotate(self.image, 180)
 
         self.speed = -speed
 
@@ -341,7 +346,9 @@ class Logic:
                 if col == 'x':
                     Block((x, y), self.start.speed, [self.blocks])
                 if col == 's':
-                    Spike((x, (y + 24)), self.start.speed, [self.spikes])
+                    Spike((x, (y + 24)), 'normal', self.start.speed, [self.spikes])
+                if col == 'z':
+                    Spike((x, y), 'invert', self.start.speed, [self.spikes])
                 if col == 'b':
                     Orb((x, y), 'bouncer', self.start.speed, [self.bouncers])
                 if col == 'p':
@@ -373,6 +380,24 @@ class Logic:
 
             self.player.dead = False
 
+    def change_level(self):
+
+        if pg.key.get_pressed()[pg.K_r]:
+            self.start.choice_made = False
+            self.started = False
+
+            self.players.empty()
+            self.blocks.empty()
+            self.spikes.empty()
+            self.bouncers.empty()
+            self.fly_portals.empty()
+            self.finish_portals.empty()
+            self.invert_portals.empty()
+            self.finish_portals.empty()
+            self.invert_portals.empty()
+
+            pg.mixer.music.stop()
+
     # Runs all game functions
     def run(self):
         if self.start.choice_made == False:
@@ -397,6 +422,7 @@ class Logic:
             self.finish_portals.update()
             self.invert_portals.update()
             self.restart()
+            self.change_level()
             self.players.draw(self.display_surface)
             self.blocks.draw(self.display_surface)
             self.spikes.draw(self.display_surface)
