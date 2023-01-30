@@ -8,8 +8,7 @@ class Player(pg.sprite.Sprite):
 
     def __init__(self, pos, spikes, blocks, bouncers, fly_portals, finish, invert_portals, *groups):
         super().__init__(*groups)
-        self.image = pg.image.load('.//Resources/happy.jpg')
-        self.image = pg.transform.scale(self.image, (64, 64))
+        self.image = pg.image.load('.//Resources/player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
 
         self.direction = pg.math.Vector2()
@@ -167,7 +166,7 @@ class Player(pg.sprite.Sprite):
 
         if pg.key.get_pressed()[pg.K_SPACE]:
             self.jump_force = 20
-        elif self.rect.y < self.floor:
+        elif self.rect.y > self.floor:
             self.jump_force -= 0.3
         
         if pg.sprite.spritecollideany(self, self.blocks):
