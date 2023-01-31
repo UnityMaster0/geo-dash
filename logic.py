@@ -6,7 +6,7 @@ from worlddata import *
 
 class Player(pg.sprite.Sprite):
 
-    def __init__(self, pos, spikes, blocks, bouncers, fly_portals, finish, invert_portals, *groups):
+    def __init__(self, pos, spikes, blocks, fake_blocks, bouncers, fly_portals, finish, invert_portals, *groups):
         super().__init__(*groups)
         self.image = pg.image.load('.//Resources/player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
@@ -19,6 +19,7 @@ class Player(pg.sprite.Sprite):
         self.dead = False
 
         self.blocks = blocks
+        self.fake_blocks = fake_blocks
         self.spikes = spikes
         self.bouncers = bouncers
         self.fly_portals = fly_portals
@@ -171,7 +172,7 @@ class Player(pg.sprite.Sprite):
         self.rect.y += self.direction.y + self.jump_force
 
     def death(self):      
-        if pg.sprite.spritecollideany(self, self.spikes):
+        if pg.sprite.spritecollideany(self, self.spikes) or pg.sprite.spritecollideany(self, self.fake_blocks):
             self.kill()
             self.dead = True
             
@@ -325,6 +326,7 @@ class Logic:
         # Creates sprite groups
         self.players = pg.sprite.Group()
         self.blocks = pg.sprite.Group()
+        self.fake_blocks = pg.sprite.Group()
         self.spikes = pg.sprite.Group()
         self.bouncers = pg.sprite.Group()
         self.fly_portals = pg.sprite.Group()
@@ -335,13 +337,15 @@ class Logic:
         self.start = Start()
 
     def makeSprites(self):
-        self.player = Player((50, 576), self.spikes, self.blocks, self.bouncers, self.fly_portals, self.finish_portals, self.invert_portals, self.players) 
+        self.player = Player((50, 576), self.spikes, self.blocks, self.fake_blocks, self.bouncers, self.fly_portals, self.finish_portals, self.invert_portals, self.players) 
         for self.row_index, row in enumerate(self.start.level):
             for self.col_index, col in enumerate(row):
                 x = self.col_index * self.start.size
                 y = self.row_index * self.start.size
                 if col == 'x':
                     Block((x, y), self.start.speed, [self.blocks])
+                if col == 'c':
+                    Block((x, y), self.start.speed, [self.fake_blocks])
                 if col == 's':
                     Spike((x, (y + 24)), 'normal', self.start.speed, [self.spikes])
                 if col == 'z':
@@ -413,6 +417,7 @@ class Logic:
 
             self.players.update()
             self.blocks.update()
+            self.fake_blocks.update()
             self.spikes.update()
             self.bouncers.update()
             self.fly_portals.update()
@@ -422,6 +427,7 @@ class Logic:
             self.change_level()
             self.players.draw(self.display_surface)
             self.blocks.draw(self.display_surface)
+            self.fake_blocks.draw(self.display_surface)
             self.spikes.draw(self.display_surface)
             self.bouncers.draw(self.display_surface)
             self.fly_portals.draw(self.display_surface)
