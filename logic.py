@@ -56,7 +56,7 @@ class Player(pg.sprite.Sprite):
 
         if pg.sprite.spritecollideany(self, self.fly_portals) and self.mode == 'normal-invert' and not self.mode_flag:
             self.mode = 'fly-invert'
-            self.image = pg.image.load('.//Resources/fly.png').convert_alpha()
+            self.image = pg.image.load('.//Resources/fly_invert.png').convert_alpha()
             self.mode_flag = True
 
         if pg.sprite.spritecollideany(self, self.fly_portals) and self.mode == 'fly' and not self.mode_flag:
@@ -364,6 +364,7 @@ class Logic:
             
             self.players.empty()
             self.blocks.empty()
+            self.fake_blocks.empty()
             self.spikes.empty()
             self.bouncers.empty()
             self.fly_portals.empty()
@@ -389,6 +390,7 @@ class Logic:
 
             self.players.empty()
             self.blocks.empty()
+            self.fake_blocks.empty()
             self.spikes.empty()
             self.bouncers.empty()
             self.fly_portals.empty()

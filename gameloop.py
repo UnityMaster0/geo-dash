@@ -13,9 +13,6 @@ class gameContoller:
     def __init__(self):
 
         pg.init()
-        #WIN = pg.display.set_mode((1680, 1080))
-        #background = pg.transform.scale(pg.image.load("Resources/background.jpeg"), (1680, 1080))
-        #WIN.blit(background, (0,0))
         self.screen = pg.display.set_mode((1680, 1080))
         pg.display.set_caption('Geo-Dash')
         self.clock = pg.time.Clock()
