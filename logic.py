@@ -151,8 +151,8 @@ class Player(pg.sprite.Sprite):
 
         if pg.key.get_pressed()[pg.K_SPACE]:
             self.jump_force = -20
-        elif self.rect.y < self.floor:
-            self.jump_force += 0.3
+        
+        self.jump_force += 0.3
         
         if pg.sprite.spritecollideany(self, self.blocks):
             self.kill()
@@ -164,8 +164,8 @@ class Player(pg.sprite.Sprite):
 
         if pg.key.get_pressed()[pg.K_SPACE]:
             self.jump_force = 20
-        elif self.rect.y < self.floor:
-            self.jump_force -= 0.3
+       
+        self.jump_force -= 0.3
         
         if pg.sprite.spritecollideany(self, self.blocks):
             self.kill()
