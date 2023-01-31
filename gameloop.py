@@ -6,7 +6,7 @@ import pygame as pg
 from worlddata import *
 from logic import Logic
 
-FPS = 120
+FPS = 60
 
 class gameContoller:
 
