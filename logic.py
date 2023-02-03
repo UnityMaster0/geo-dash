@@ -84,16 +84,24 @@ class Player(pg.sprite.Sprite):
                 else:
                     self.floor = block.rect.y - 78
                     self.pass_check = block.rect.y
+
+        if pg.sprite.spritecollideany(self, self.fake_blocks):
+            self.kill()
+            self.dead = True
                     
     def floor_set_invert(self):
         self.pass_check = -1000
-        for block in self.blocks:
+        for block in self.fake_blocks:
             if block.rect.x >= 0 and block.rect.x <= 114:
                 if block.rect.y <= self.pass_check:
                     pass
                 else:
                     self.floor = block.rect.y + 78
                     self.pass_check = block.rect.y
+                    
+        if pg.sprite.spritecollideany(self, self.blocks):
+            self.kill()
+            self.dead = True
 
     def bounce(self):
         if pg.sprite.spritecollideany(self, self.bouncers) and pg.key.get_pressed()[pg.K_SPACE]:
@@ -175,7 +183,7 @@ class Player(pg.sprite.Sprite):
         self.rect.y += self.direction.y + self.jump_force
 
     def death(self):      
-        if pg.sprite.spritecollideany(self, self.spikes) or pg.sprite.spritecollideany(self, self.fake_blocks):
+        if pg.sprite.spritecollideany(self, self.spikes):
             self.kill()
             self.dead = True
             
