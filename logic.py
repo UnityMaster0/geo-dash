@@ -183,7 +183,7 @@ class Player(pg.sprite.Sprite):
         self.rect.y += self.direction.y + self.jump_force
 
     def death(self):      
-        if pg.sprite.spritecollideany(self, self.spikes) or pg.sprite.spritecollideany(self, self.fake_blocks):
+        if pg.sprite.spritecollideany(self, self.spikes):
             self.kill()
             self.dead = True
             
