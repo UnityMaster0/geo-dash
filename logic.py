@@ -6,14 +6,14 @@ from worlddata import *
 
 class Player(pg.sprite.Sprite):
 
-    def __init__(self, pos, spikes, blocks, fake_blocks, bouncers, fly_portals, finish, invert_portals, *groups):
+    def __init__(self, pos, spikes, blocks, fake_blocks, bouncers, fly_portals, finish, invert_portals, gravity, *groups):
         super().__init__(*groups)
         self.image = pg.image.load('.//Resources/image.png')
         self.image = pg.transform.scale(self.image, (64, 64))
         self.rect = self.image.get_rect(topleft=pos)
 
         self.direction = pg.math.Vector2()
-        self.gravity_force = 15
+        self.gravity_force = gravity
         self.jump_force = 0
         self.mode = 'normal'
         self.mode_pause = False
@@ -313,6 +313,7 @@ class Start:
             self.size = SIZEONE
             self.speed = SPEEDONE
             self.music = MUSICONE
+            self.gravity = GRAVITYONE
             self.choice_made = True
 
         if pos >= (200, 114) and pos <= (264, 50) and pressed == (True, False, False):
@@ -320,6 +321,7 @@ class Start:
             self.size = SIZETWO
             self.speed = SPEEDTWO
             self.music = MUSICTWO
+            self.gravity = GRAVITYTWO
             self.choice_made = True
 
         if pos >= (350, 114) and pos <= (414, 50) and pressed == (True, False, False):
@@ -327,6 +329,7 @@ class Start:
             self.size = SIZETHREE
             self.speed = SPEEDTHREE
             self.music = MUSICTHREE
+            self.gravity = GRAVITYTHREE
             self.choice_made = True
 
 class Logic:
@@ -348,7 +351,7 @@ class Logic:
         self.start = Start()
 
     def makeSprites(self):
-        self.player = Player((50, 576), self.spikes, self.blocks, self.fake_blocks, self.bouncers, self.fly_portals, self.finish_portals, self.invert_portals, self.players) 
+        self.player = Player((50, 576), self.spikes, self.blocks, self.fake_blocks, self.bouncers, self.fly_portals, self.finish_portals, self.invert_portals, self.start.gravity, self.players) 
         for self.row_index, row in enumerate(self.start.level):
             for self.col_index, col in enumerate(row):
                 x = self.col_index * self.start.size
