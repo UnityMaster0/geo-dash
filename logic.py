@@ -8,7 +8,7 @@ class Player(pg.sprite.Sprite):
 
     def __init__(self, pos, spikes, blocks, fake_blocks, bouncers, fly_portals, finish, invert_portals, gravity, *groups):
         super().__init__(*groups)
-        self.image = pg.image.load('.//Resources/image.png')
+        self.image = pg.image.load('.//Resources/happy.jpg')
         self.image = pg.transform.scale(self.image, (64, 64))
         self.rect = self.image.get_rect(topleft=pos)
 
